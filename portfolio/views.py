@@ -20,4 +20,5 @@ def projetos(request):
 
 
 def contato(request):
-    return render(request, 'portfolio/contato.html')
+    pessoal = Pessoal.objects.first()
+    return render(request, 'portfolio/contato.html', {'pessoal': pessoal})
