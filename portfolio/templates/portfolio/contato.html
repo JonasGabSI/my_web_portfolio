@@ -16,13 +16,13 @@
 
 {% block content %}
     <div class="secao">
-        {% if pessoa %}
+        {% if pessoal %}
         <ul>
-            <li><a href="{{ pessoa.link_git }}">GitHub</a></li>
-            <li><a href="{{ pessoa.link_linkedin }}">linkedin</a></li>
-            <li><strong>email: </strong> {{ pessoa.email }}</li>
+            <li><a href="{{ pessoal.git }}" target="_blank">GitHub</a></li>
+            <li><strong>email: </strong> {{ pessoal.email }}</li>
         </ul>
-    {% endif %}
+        {% else %}
+        <p>Dados de contato não encontrados.</p>
+        {% endif %}
     </div>
-
 {% endblock %}
