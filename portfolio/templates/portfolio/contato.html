@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+
+{% block title %}Contato - Meu Contato{% endblock %}
+
+{% block header_title %}Meu Contato{% endblock %}
+
+{% block extra_css %}
+.secao {
+    background: white;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+{% endblock %}
+
+{% block content %}
+    <div class="secao">
+        {% if pessoa %}
+        <ul>
+            <li><a href="{{ pessoa.link_git }}">GitHub</a></li>
+            <li><a href="{{ pessoa.link_linkedin }}">linkedin</a></li>
+            <li><strong>email: </strong> {{ pessoa.email }}</li>
+        </ul>
+    {% endif %}
+    </div>
+
+{% endblock %}
