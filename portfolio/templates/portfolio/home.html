@@ -50,30 +50,32 @@
 {% endblock %}
 
 {% block content %}
+{% load static%}
+{% if pessoal %}
 <div class="perfil">
-    <img src="https://github.com/JonasGabSI.png" alt="Minha Foto">
-    <h2>Jonas Aleixo</h2>
-    <p>Estudante de Sistemas de Informação - UAST/UFRPE</p>
+    <img src="{{ pessoal.url_imagem }}" alt="Foto de {{pessoal.nome}}">
+    <h2>{{ pessoal.nome }}</h2>
+    <p>Estudante de {{ pessoal.curso}} - UAST/UFRPE</p>
 </div>
 
 <div class="secao">
     <h3>Sobre Mim</h3>
     <p>
-        Sou estudante de Sistemas de Informação na UAST/UFRPE,
-        atualmente no 4º período do curso.
+        {{ pessoal.descricao }}
     </p>
 </div>
 
 <div class="secao">
     <h3>Dados Pessoais</h3>
     <ul>
-        <li><strong>Nome:</strong> Jonas Gabriel Aleixo da Silva</li>
-        <li><strong>Curso:</strong> Bacharelado em Sistemas de Informação</li>
-        <li><strong>Período:</strong> 4º</li>
-        <li><strong>E-mail:</strong> jonas.aleixo@ufrpe.br</li>
-        <li><strong>GitHub:</strong> github.com/JonasGabSI</li>
+        <li><strong>Nome:</strong>{{ pessoal.nome }}</li>
+        <li><strong>Curso:</strong>{{ pessoal.curso }}</li>
+        <li><strong>Período:</strong>{{ pessoal.periodo }}</li>
+        <li><strong>E-mail:</strong>{{ pessoal.email }}</li>
+        <li><strong>GitHub:</strong>{{ pessoal.git }}</li>
     </ul>
 </div>
+{% endif %}
 
 <div class="secao">
     <h3>Cursos e Certificados</h3>
