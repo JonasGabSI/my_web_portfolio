@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Meu portfólio{% endblock %}</title>
+    <title>{% block title %}Meu Portfolio{% endblock %}</title>
     <style>
         * {
             margin: 0;
@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
             color: #333;
         }
@@ -28,6 +28,7 @@
             background-color: #34495e;
             padding: 10px 0;
             text-align: center;
+            position: relative;
         }
         nav a {
             color: white;
@@ -50,18 +51,161 @@
             padding: 15px 0;
             margin-top: 40px;
         }
+
+        /* ─── Estilos do Sino de Notificacoes ─── */
+        .sino-container {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .sino-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.4em;
+            cursor: pointer;
+            position: relative;
+        }
+        .sino-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.65em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .sino-badge.sem-conexao {
+            background-color: #95a5a6;
+        }
+        .sino-badge.sem-mensagens {
+            background-color: #27ae60;
+        }
+
+        /* ─── Dropdown de Notificacoes ─── */
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 340px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 999;
+            text-align: left;
+            border: 1px solid #e1e8ed;
+        }
+
+        .notif-dropdown.aberto {
+            display: block;
+        }
+
+        .notif-dropdown-header {
+            padding: 12px 16px;
+            background: #2c3e50;
+            color: white;
+            font-weight: bold;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .notif-dropdown-header button {
+            background: none;
+            border: none;
+            color: #5dade2;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-decoration: underline;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        .notif-dropdown-header button:hover {
+            color: #85c1e9;
+        }
+
+        .notif-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: block;
+            width: 100%;
+        }
+
+        .notif-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notif-item.nao-lida {
+            border-left: 4px solid #3498db;
+            background: #f0f7fc;
+        }
+
+        .notif-item .notif-mensagem {
+            font-size: 0.9em;
+            color: #2c3e50;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .notif-item .notif-data {
+            font-size: 0.75em;
+            color: #7f8c8d;
+            margin-top: 6px;
+        }
+
+        .notif-vazio {
+            padding: 24px;
+            text-align: center;
+            color: #95a5a6;
+            font-size: 0.9em;
+        }
+
         {% block extra_css %}{% endblock %}
     </style>
 </head>
 <body>
     <header>
-        <h1>{% block header_title %}Portfólio do Aluno{% endblock %}</h1>
+        <h1>{% block header_title %}Portfolio do Aluno{% endblock %}</h1>
     </header>
 
     <nav>
-        <a href="{% url 'portfolio:home' %}">Início</a>
+        <a href="{% url 'portfolio:home' %}">Inicio</a>
         <a href="{% url 'portfolio:projetos' %}">Projetos</a>
-        <a href="{% url 'portfolio:contato' %}">Contato</a>
+
+        {% if user.is_authenticated %}
+        <div class="sino-container">
+            <button class="sino-btn" id="sino-btn" title="Notificacoes">
+                &#128276;
+                <span class="sino-badge sem-conexao" id="sino-badge">X</span>
+            </button>
+            <div class="notif-dropdown" id="notif-dropdown">
+                <div class="notif-dropdown-header">
+                    <span>Notificacoes</span>
+                    <button id="btn-ler-todas">Marcar todas como lidas</button>
+                </div>
+                <div id="notif-lista">
+                    <div class="notif-vazio">Carregando...</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </nav>
 
     <div class="container">
@@ -69,7 +213,161 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 - Portfólio Acadêmico | UAST</p>
+        <p>&copy; 2026 - Portfolio Academico | UAST</p>
     </footer>
+
+    {% if user.is_authenticated %}
+    <script>
+    (function() {
+        var MS_URL = '{{ NOTIFICACAO_MS_URL }}';
+        var API_KEY = '{{ NOTIFICACAO_MS_API_KEY }}';
+        var USER_ID = '{{ NOTIFICACAO_USER_ID }}';
+
+        var sinoBtn = document.getElementById('sino-btn');
+        var sinoBadge = document.getElementById('sino-badge');
+        var dropdown = document.getElementById('notif-dropdown');
+        var notifLista = document.getElementById('notif-lista');
+
+        var headers = {
+            'X-Api-Key': API_KEY,
+            'X-User-Id': USER_ID,
+        };
+
+        function buscarContagem() {
+            fetch(MS_URL + '/api/notificacoes/nao-lidas/', { headers: headers })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Erro na API');
+                    return response.json();
+                })
+                .then(function(data) {
+                    var count = data.count;
+                    sinoBadge.classList.remove('sem-conexao', 'sem-mensagens');
+
+                    if (count === 0) {
+                        sinoBadge.textContent = '0';
+                        sinoBadge.classList.add('sem-mensagens');
+                    } else {
+                        sinoBadge.textContent = count;
+                    }
+                })
+                .catch(function() {
+                    sinoBadge.textContent = 'X';
+                    sinoBadge.classList.remove('sem-mensagens');
+                    sinoBadge.classList.add('sem-conexao');
+                });
+        }
+
+        function buscarNotificacoes() {
+            fetch(MS_URL + '/api/notificacoes/', { headers: headers })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Erro na API');
+                    return response.json();
+                })
+                .then(function(notificacoes) {
+                    if (notificacoes.length === 0) {
+                        notifLista.innerHTML = '<div class="notif-vazio">Nenhuma notificacao.</div>';
+                        return;
+                    }
+
+                    var html = '';
+
+                    notificacoes.forEach(function(notif) {
+                        var classeNaoLida = notif.is_read ? '' : 'nao-lida';
+                        var d = new Date(notif.criado_em);
+                        var dataFmt = d.toLocaleDateString('pt-BR') + ', ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                        
+                        var tituloTexto = notif.titulo ? notif.titulo : 'Nova Notificação';
+
+                        html += '<div class="notif-item ' + classeNaoLida + '" data-id="' + notif.id + '">' +
+                                    '<div style="font-weight: 800; color: #1a252f; font-size: 1.05em; margin-bottom: 4px; display: block;">' + 
+                                        tituloTexto + 
+                                    '</div>' +
+                                    '<div class="notif-mensagem">' + notif.mensagem + '</div>' +
+                                    '<div class="notif-data">' + dataFmt + '</div>' + 
+                                '</div>';
+                    });
+
+                    notifLista.innerHTML = html;
+
+                    var items = notifLista.querySelectorAll('.notif-item.nao-lida');
+                    items.forEach(function(item) {
+                        item.addEventListener('click', function() {
+                            var id = this.getAttribute('data-id');
+                            marcarComoLida(id, this);
+                        });
+                    });
+                })
+                .catch(function() {
+                    notifLista.innerHTML = '<div class="notif-vazio">Erro ao carregar notificacoes.</div>';
+                });
+        }
+
+        function marcarComoLida(id, elemento) {
+            fetch(MS_URL + '/api/notificacoes/' + id + '/lida/', {
+                method: 'PATCH',
+                headers: headers,
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Erro');
+                return response.json();
+            })
+            .then(function() {
+                elemento.classList.remove('nao-lida');
+                buscarContagem();
+            })
+            .catch(function(erro) {
+                console.error('Erro ao marcar como lida:', erro);
+            });
+        }
+
+        sinoBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var aberto = dropdown.classList.contains('aberto');
+
+            if (aberto) {
+                dropdown.classList.remove('aberto');
+            } else {
+                dropdown.classList.add('aberto');
+                buscarNotificacoes();
+            }
+        });
+
+        document.addEventListener('click', function() {
+            dropdown.classList.remove('aberto');
+        });
+
+        dropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        var btnLerTodas = document.getElementById('btn-ler-todas');
+
+        if (btnLerTodas) {
+            btnLerTodas.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                fetch(MS_URL + '/api/notificacoes/marcar-todas-lidas/', {
+                    method: 'PATCH',
+                    headers: headers,
+                })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Erro na API');
+                    return response.json();
+                })
+                .then(function() {
+                    buscarContagem();
+                    buscarNotificacoes();
+                })
+                .catch(function(erro) {
+                    console.error('Erro ao marcar todas como lidas:', erro);
+                });
+            });
+        }
+
+        buscarContagem();
+        setInterval(buscarContagem, 5000);
+    })();
+    </script>
+    {% endif %}
 </body>
 </html>

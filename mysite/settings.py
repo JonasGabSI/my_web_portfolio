@@ -62,9 +62,11 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.notificacao_ms',
             ],
         },
     },
@@ -139,3 +141,6 @@ SIMPLE_JWT = {
  'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), # Token de acesso vale 30minutos
  'REFRESH_TOKEN_LIFETIME': timedelta(days=1), # Token de refresh vale 1 dia
 }
+
+NOTIFICACAO_MS_URL = 'http://127.0.0.1:8001'
+NOTIFICACAO_MS_API_KEY = '74fb8f2fcbeb69f5'
