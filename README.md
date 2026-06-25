@@ -69,8 +69,11 @@ python3 manage.py runserver 8000
 Com os **dois servidores rodando simultaneamente** (um no terminal na porta 8000 e outro no terminal na porta 8001), siga os passos:
 
 1. Acesse o admin do microsserviço em `http://127.0.0.1:8001/admin/`.
-2. Verifique se a empresa cadastrada (ex.: "Portfólio UAST") possui a `API_KEY` que está configurada no `settings.py` do projeto principal.
-3. Acesse o portfólio principal em `http://127.0.0.1:8000/portfolio/` ou `http://127.0.0.1:8000/`.
-4. O sino de notificações fará requisições automáticas (polling) para o microsserviço a cada 5 segundos.
-5. **Teste Automatizado:** Na raiz do microsserviço existe um script chamado `enviar_notificacao.py`. Abra um terceiro terminal com o ambiente ativado e rode `python enviar_notificacao.py`. O sino no navegador do portfólio acenderá sozinho demonstrando o funcionamento em tempo real da API.
+2. Cadastre uma nova Empresa (ex.: "Portfólio UAST"). **Copie a `API_KEY` gerada para ela** e cole substituindo o valor em dois arquivos:
+   * No Portfólio: em `mysite/settings.py` (na variável `NOTIFICACAO_MS_API_KEY`)
+   * No Microsserviço: no arquivo `enviar_notificacao.py` (na variável `API_KEY`)
+3. No admin do microsserviço, cadastre também um **Target** (vínculo) apontando essa Empresa para o `user_id: 1`.
+4. Acesse o portfólio principal em `http://127.0.0.1:8000/portfolio/` (ou crie um usuário de teste e faça login).
+5. O sino de notificações fará requisições automáticas (polling) para o microsserviço a cada 5 segundos.
+6. **Teste Automatizado:** Abra um terceiro terminal com a venv do microsserviço ativada e execute `python enviar_notificacao.py`. O sino no navegador do portfólio acenderá sozinho demonstrando o funcionamento em tempo real da API.
 ___
